@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import connect from '@/lib/mongo'; // your mongoose connect util
 import Order from '@/lib/models/Order';
-import { updateOrderStatusFromApi } from '../create/route';
+import { updateOrderStatusFromApi } from '../create/app';
 
 
 

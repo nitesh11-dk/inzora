@@ -1,6 +1,6 @@
 // app/api/orders/create/route.js
 import { NextResponse } from 'next/server';
-import connect from '@/lib/mongo'; // your mongoose connect util
+import connect from '@/lib/mongo';
 import Order from '@/lib/models/Order';
 import Wallet from '@/lib/models/Wallet';
 import PlatformService from '@/lib/models/Service';
@@ -8,62 +8,25 @@ import FormData from 'form-data';
 import axios from 'axios';
 import { getUserFromCookies } from '@/lib/auth';
 import User from '@/lib/models/User';
-// const providerApiUrl = process.env.PROVIDER_API_URL;
-// const providerApiKey = process.env.PROVIDER_API_KEY;
-
-    const providerApiUrl = 'http://localhost:6000/api'; // 
-    const providerApiKey = 'your_api_key_here';
-
- export async function updateOrderStatusFromApi(actualOrderIdFromApi, createdOrderId) {
-  try {
-    const form = new FormData();
-    form.append('key', providerApiKey);
-    form.append('action', 'status');
-    form.append('order', actualOrderIdFromApi);
-
-    const response = await axios.post(providerApiUrl, form, {
-      headers: form.getHeaders(),
-    });
-
-    const { charge, start_count, status, remains } = response.data;
-
-    const updatedOrder = await Order.findByIdAndUpdate(
-      createdOrderId,
-      {
-        startCount: start_count,
-        status,
-        remains,
-      },
-      { new: true }
-    );
-
-    return updatedOrder;
-  } catch (error) {
-    console.error('Error updating order status:', error.message);
-    throw new Error('Failed to update order status');
-  }
-}
+import {updateOrderStatusFromApi} from './app'
+const providerApiUrl = 'http://localhost:6000/api';
+const providerApiKey = 'your_api_key_here';
 
 
 export async function POST(request) {
   try {
     await connect();
 
-    const currUser = await getUserFromCookies();
-    if (!currUser || !currUser.id) {
-      throw new Error("Unauthorized: Invalid token");
-    }
-
-    
-
-    if (!currUser) {
+    // ✅ Get user from cookies
+    const currUser = await getUserFromCookies(request);
+    if (!currUser?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { category, platform, price, quantity, service, link } = body;
 
-    // Validate input
+    // ✅ Input validation
     if (
       !category || typeof category !== 'string' ||
       !platform || typeof platform !== 'string' ||
@@ -76,25 +39,36 @@ export async function POST(request) {
     }
 
     const userId = currUser.id;
-    const user = await User.findById(userId); // keep as Mongoose doc
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
 
-    // Fetch wallet
+    // ✅ Fetch wallet
     const wallet = await Wallet.findOne({ userId });
-    if (!wallet) return NextResponse.json({ error: 'Wallet not found.' }, { status: 404 });
+    if (!wallet) {
+      return NextResponse.json({ error: 'Wallet not found.' }, { status: 404 });
+    }
 
-    // Fetch platform service
+    // ✅ Fetch platform service
     const platformService = await PlatformService.findOne({ name: platform });
-    if (!platformService) return NextResponse.json({ error: 'Platform not found.' }, { status: 404 });
+    if (!platformService) {
+      return NextResponse.json({ error: 'Platform not found.' }, { status: 404 });
+    }
 
-    // Get category services (assuming categories is a Map or plain object)
+    // ✅ Get category services
     const categoryServices = platformService.categories.get(category) || platformService.categories[category];
-    if (!categoryServices) return NextResponse.json({ error: 'Category not found.' }, { status: 404 });
+    if (!categoryServices) {
+      return NextResponse.json({ error: 'Category not found.' }, { status: 404 });
+    }
 
-    // Find matching service by ID
+    // ✅ Find matching service
     const matchedService = categoryServices.find(svc => svc.service === service);
-    if (!matchedService) return NextResponse.json({ error: 'Service not found in category.' }, { status: 404 });
+    if (!matchedService) {
+      return NextResponse.json({ error: 'Service not found in category.' }, { status: 404 });
+    }
 
-    // Validate quantity
+    // ✅ Validate quantity
     const qty = parseInt(quantity, 10);
     if (qty < matchedService.min || qty > matchedService.max) {
       return NextResponse.json({
@@ -102,53 +76,41 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
+    // ✅ Calculate expected price (with discount)
+    const discountArray = Array.isArray(user.discount) ? user.discount : [];
+    const discountObj = discountArray.find(d =>
+      d.serviceId.toString() === matchedService.service.toString()
+    );
+    const discountApplied = discountObj ? discountObj.discount : 0;
 
+    let expectedPrice = (qty / 1000) * matchedService.rate;
+    if (discountApplied) {
+      expectedPrice *= (1 - discountApplied / 100);
+    }
+    expectedPrice = expectedPrice.toFixed(2);
 
-    // Validate price & also checking hte disocunt 
-// Find discount for this service from user.discount
-const discountArray = Array.isArray(user.discount) ? user.discount : [];
+    if (parseFloat(expectedPrice) !== parseFloat(price)) {
+      return NextResponse.json({
+        error: `Price mismatch. Expected price is ${expectedPrice}.`
+      }, { status: 400 });
+    }
 
-const discountObj = discountArray.find(d =>
-  d.serviceId.toString() === matchedService.service.toString()
-);
-
-const discountApplied = discountObj ? discountObj.discount : 0;
-
-// Calculate expected price with discount applied
-let expectedPrice = (qty / 1000) * matchedService.rate;
-
-if (discountApplied) {
-  expectedPrice = expectedPrice * (1 - discountApplied / 100);
-}
-
-expectedPrice = expectedPrice.toFixed(2);
-if (parseFloat(expectedPrice) !== parseFloat(price)) {
-  return NextResponse.json({
-    error: `Price mismatch. Expected price is ${expectedPrice}.`
-  }, { status: 400 });
-}
-
-    // Check wallet balance
+    // ✅ Check wallet balance
     if (wallet.balance < parseFloat(expectedPrice)) {
       return NextResponse.json({ error: 'Insufficient wallet balance.' }, { status: 400 });
     }
 
-    // Send order to provider API
+    // ✅ Send order to provider API with correct form-data
     const form = new FormData();
     form.append('key', providerApiKey);
     form.append('action', 'add');
     form.append('service', service);
-    form.append('link', link);
+    form.append('link', link); // use 'link' if that's what API expects
     form.append('quantity', qty);
 
-    const apiResponse = await axios.post(providerApiUrl, {
-      key: providerApiKey,
-      action: 'add',
-      service,
-      url: link,      //TODO  need to update the , url to link for hte ooriginal api key  note: use 'url' key if your backend expects 'url'
-      quantity: qty,
+    const apiResponse = await axios.post(providerApiUrl, form, {
+      headers: form.getHeaders(),
     });
-    
 
     if (!apiResponse.data.order) {
       return NextResponse.json({ error: apiResponse.data.error || 'Provider API error' }, { status: 500 });
@@ -156,12 +118,12 @@ if (parseFloat(expectedPrice) !== parseFloat(price)) {
 
     const externalOrderId = apiResponse.data.order;
 
-    // Deduct wallet balance
+    // ✅ Deduct wallet balance
     wallet.balance -= parseFloat(expectedPrice);
     wallet.lastUpdated = new Date();
     await wallet.save();
 
-    // Save new order in DB
+    // ✅ Save new order in DB
     const newOrder = new Order({
       userId,
       category,
@@ -172,12 +134,7 @@ if (parseFloat(expectedPrice) !== parseFloat(price)) {
       actualOrderIdFromApi: externalOrderId,
       status: 'pending',
     });
-
     await newOrder.save();
-
-    // Optionally update status async but do not wait
-    // TODO : need to uncomment this line if you want to update the order status from the provider API
-    // updateOrderStatusFromApi(externalOrderId, newOrder._id).catch(console.error);
 
     return NextResponse.json({
       message: 'Order created successfully.',
@@ -192,4 +149,3 @@ if (parseFloat(expectedPrice) !== parseFloat(price)) {
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }
-

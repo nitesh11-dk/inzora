@@ -4,7 +4,9 @@ import { useState } from "react";
 import { setUserDiscount } from "./actions"; // import server action
 import { useRouter } from "next/navigation";
 
-export default function DiscountForm({ userId ="689c1502eba5f60ca5fef873" }) {
+ function DiscountForm() {
+
+  // const userId = "689c1502eba5f60ca5fef873" ;
   const [serviceId, setServiceId] = useState("");
   const [discount, setDiscount] = useState("");
   const [message, setMessage] = useState(null);
@@ -74,3 +76,5 @@ export default function DiscountForm({ userId ="689c1502eba5f60ca5fef873" }) {
     </form>
   );
 }
+
+export default DiscountForm;

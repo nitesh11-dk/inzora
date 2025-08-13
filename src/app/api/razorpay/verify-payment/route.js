@@ -20,7 +20,7 @@ export async function POST(request) {
     const userId = user.id;
     const body = await request.json();
 
-    console.log('verify-payment body:', body);
+    // console.log('verify-payment body:', body);
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 

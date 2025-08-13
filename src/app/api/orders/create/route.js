@@ -14,7 +14,7 @@ import User from '@/lib/models/User';
     const providerApiUrl = 'http://localhost:6000/api'; // 
     const providerApiKey = 'your_api_key_here';
 
-async function updateOrderStatusFromApi(actualOrderIdFromApi, createdOrderId) {
+ export async function updateOrderStatusFromApi(actualOrderIdFromApi, createdOrderId) {
   try {
     const form = new FormData();
     form.append('key', providerApiKey);

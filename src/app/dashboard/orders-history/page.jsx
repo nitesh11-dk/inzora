@@ -4,17 +4,12 @@ import { FiRefreshCw } from "react-icons/fi";
 
 const OrdersHistory = () => {
   const [orders, setOrders] = useState([]);
-  const [refreshingOrders, setRefreshingOrders] = useState([]);
-
-  // Replace this with your actual auth token retrieval logic
 
   async function fetchAllOrders() {
     try {
       const res = await fetch('/api/orders', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
 
       const data = await res.json();
@@ -31,37 +26,36 @@ const OrdersHistory = () => {
   }
 
   useEffect(() => {
-      fetchAllOrders();
+    fetchAllOrders();
   }, []);
 
-  // Dummy refreshOrderById implementation (replace with your real API call)
-  async function refreshOrderById(orderIdApi, orderId) {
+  async function refreshOrderById(actualOrderIdFromApi, createdOrderId) {
     try {
-      const res = await fetch(`/api/orders/refresh/${orderIdApi}`, {
+      const res = await fetch(`/api/orders/refresh`, {
         method: 'POST',
-        headers: {
-
-          'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actualOrderIdFromApi,
+          createdOrderId
+        })
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        console.error('Failed to refresh order status');
+        console.error('Failed to refresh order status:', data.error);
         return;
       }
 
-      // Optionally fetch orders again to update UI
+      console.log('Order refreshed successfully:', data);
       await fetchAllOrders();
     } catch (error) {
       console.error('Error refreshing order:', error);
     }
   }
 
-  const handleRefresh = async (orderId, orderIdApi) => {
-
-    setRefreshingOrders((prev) => [...prev, orderId]);
-    await refreshOrderById(orderIdApi, orderId);
-    setRefreshingOrders((prev) => prev.filter((id) => id !== orderId));
+  const handleRefresh = async (actualOrderIdFromApi, createdOrderId) => {
+    await refreshOrderById(actualOrderIdFromApi, createdOrderId);
   };
 
   return (
@@ -84,9 +78,7 @@ const OrdersHistory = () => {
             </thead>
             <tbody>
               {orders.map((order) => {
-                const isRefreshing = refreshingOrders.includes(order._id);
                 const isCompleted = order.status?.toLowerCase() === "completed";
-
                 return (
                   <tr key={order._id} className="text-center text-gray-800">
                     <td className="px-4 py-2 border">{order.actualOrderIdFromApi || "-"}</td>
@@ -97,12 +89,12 @@ const OrdersHistory = () => {
                     <td className="px-4 py-2 border">{order.remains || "-"}</td>
                     <td className="px-4 py-2 border">
                       <button
-                        onClick={() => handleRefresh(order._id, order.actualOrderIdFromApi)}
+                        onClick={() => handleRefresh(order.actualOrderIdFromApi, order._id)}
                         className={`text-indigo-600 hover:text-indigo-800 ${isCompleted ? "opacity-50 cursor-not-allowed" : ""}`}
                         title={isCompleted ? "Completed" : "Refresh Order Status"}
-                        disabled={isRefreshing || isCompleted}
+                        disabled={isCompleted}
                       >
-                        <FiRefreshCw size={18} className={isRefreshing ? "animate-spin" : ""} />
+                        <FiRefreshCw size={18} />
                       </button>
                     </td>
                   </tr>
@@ -119,9 +111,7 @@ const OrdersHistory = () => {
       <div className="md:hidden space-y-4">
         {orders && orders.length > 0 ? (
           orders.map((order) => {
-            const isRefreshing = refreshingOrders.includes(order._id);
             const isCompleted = order.status?.toLowerCase() === "completed";
-
             return (
               <div
                 key={order._id}
@@ -146,12 +136,12 @@ const OrdersHistory = () => {
                   <span className="font-semibold">Remains:</span> {order.remains || "-"}
                 </p>
                 <button
-                  onClick={() => handleRefresh(order._id, order.actualOrderIdFromApi)}
+                  onClick={() => handleRefresh(order.actualOrderIdFromApi, order._id)}
                   className={`flex items-center text-indigo-600 hover:text-indigo-800 ${isCompleted ? "opacity-50 cursor-not-allowed" : ""}`}
                   title={isCompleted ? "Completed" : "Refresh Order Status"}
-                  disabled={isRefreshing || isCompleted}
+                  disabled={isCompleted}
                 >
-                  <FiRefreshCw size={18} className={`mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+                  <FiRefreshCw size={18} className="mr-1" />
                   <span>Refresh</span>
                 </button>
               </div>

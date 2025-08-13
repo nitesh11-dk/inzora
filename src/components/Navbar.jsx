@@ -5,6 +5,7 @@ import { FaWallet, FaBars, FaWhatsapp, FaInstagram, FaPlus } from "react-icons/f
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiSettings, FiPackage, FiDollarSign, FiFileText, FiUser } from "react-icons/fi";
+import Image from "next/image";
 
 
 export default function Navbar({ isLoggedIn, wallet,children }) {
@@ -34,6 +35,7 @@ export default function Navbar({ isLoggedIn, wallet,children }) {
             </button>
           )}
           <Link href="/" className="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <Image href='/logo.jpg' width={20 } height={20}    className="h-12 w-12 rounded-full object-cover"></Image>
             <span className="hidden sm:inline">Brezora</span>
           </Link>
         </div>

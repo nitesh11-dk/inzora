@@ -126,7 +126,7 @@ const PlatformServicePage = () => {
     
 
   if (loading) {
-    return  <div className="flex items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>;;
+    return  <div className="flex items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>;
   }
 
   if (error) {

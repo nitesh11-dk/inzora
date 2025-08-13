@@ -12,7 +12,7 @@ const TopUPHistory = async () => {
   }
 
   return (
-    <div className="p-6 w-full">
+    <div className="p-6 w-full text-center">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Top UP History</h2>
 
       {orders && orders.length > 0 ? (
@@ -71,7 +71,7 @@ const TopUPHistory = async () => {
           </div>
         </>
       ) : (
-        <p className="text-gray-600">No orders found.</p>
+        <p className="text-gray-600 ">No orders found.</p>
       )}
     </div>
   );

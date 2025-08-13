@@ -65,7 +65,7 @@ const OrdersHistory = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 w-full min-h-screen">
+    <div className="p-6 bg-gray-50 text-center w-full min-h-screen">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">My Orders</h2>
 
       {orders && orders.length > 0 ? (

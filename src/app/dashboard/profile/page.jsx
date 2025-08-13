@@ -23,9 +23,7 @@ export default function ProfilePage() {
     alert("Deleted!");
   }
 
-  if (!user) return  <div className="flex justify-center items-center h-full bg-gray-50 text-gray-800">
-  Loading...
-</div>;
+  if (!user)  return  <div className="flex w-full items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>;
 
   return (
     <div className="flex justify-center w-full items-center h-full bg-gray-50 px-4">

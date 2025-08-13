@@ -31,7 +31,7 @@ const Services = () => {
   };
 
   if (loading) {
-    return <p className="text-center py-10">Loading services...</p>;
+   return  <div className="flex items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>
   }
 
   if (error) {

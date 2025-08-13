@@ -128,7 +128,6 @@ if (parseFloat(expectedPrice) !== parseFloat(price)) {
   }, { status: 400 });
 }
 
-console.log(expectedPrice)
     // Check wallet balance
     if (wallet.balance < parseFloat(expectedPrice)) {
       return NextResponse.json({ error: 'Insufficient wallet balance.' }, { status: 400 });
@@ -146,7 +145,7 @@ console.log(expectedPrice)
       key: providerApiKey,
       action: 'add',
       service,
-      url: link,      // note: use 'url' key if your backend expects 'url'
+      url: link,      //TODO  need to update the , url to link for hte ooriginal api key  note: use 'url' key if your backend expects 'url'
       quantity: qty,
     });
     
@@ -177,6 +176,7 @@ console.log(expectedPrice)
     await newOrder.save();
 
     // Optionally update status async but do not wait
+    // TODO : need to uncomment this line if you want to update the order status from the provider API
     // updateOrderStatusFromApi(externalOrderId, newOrder._id).catch(console.error);
 
     return NextResponse.json({

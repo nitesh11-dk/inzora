@@ -7,7 +7,9 @@ import { getWalletFromToken } from "../actions";
 import { getProfileAction  } from "../profile/actions";
 import { FaWallet } from "react-icons/fa";
 
-const BASE_URL = '/api/razorpay'; // 
+const BASE_URL = '/api/razorpay'; 
+
+
 const TopUpWallet = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 

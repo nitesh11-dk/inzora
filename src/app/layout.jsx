@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FaWhatsapp } from "react-icons/fa";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -59,6 +58,7 @@ export default async function RootLayout({ children }) {
       >
         <FaWhatsapp className="text-2xl" />
       </a>
+
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       </body>
     </html>

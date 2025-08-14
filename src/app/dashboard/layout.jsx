@@ -1,7 +1,9 @@
+// app/dashboard/layout.js
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 import { getUserFromToken } from "@/lib/auth";
-import { getWalletFromToken } from "./actions"; // Make sure it accepts token or userId
+import { getWalletFromToken } from "./actions"; 
+import { WalletProvider } from "@/app/context/walletContext"; // client-side
 
 export default async function DashboardLayout({ children }) {
   const cookieStore = await cookies();
@@ -13,22 +15,17 @@ export default async function DashboardLayout({ children }) {
   if (user) {
     try {
       wallet = await getWalletFromToken(); 
-      // Pass token or user.id based on your getWalletFromToken implementation
     } catch (error) {
       console.log("Error fetching wallet:", error);
     }
   }
 
-
   return (
-    <div >
-      <Navbar
-        isLoggedIn={!!user}
-        wallet={wallet}
-       >
-      {children}
+    <WalletProvider initialWallet={wallet}> {/* pass initial server wallet */}
+        <Navbar isLoggedIn={!!user} >
+          <main className="w-full">{children}</main>
         </Navbar>
-
-    </div>
+      
+    </WalletProvider>
   );
 }

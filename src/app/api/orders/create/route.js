@@ -9,8 +9,10 @@ import axios from 'axios';
 import { getUserFromCookies } from '@/lib/auth';
 import User from '@/lib/models/User';
 import {updateOrderStatusFromApi} from './app'
-const providerApiUrl = 'http://localhost:6000/api';
-const providerApiKey = 'your_api_key_here';
+
+
+const providerApiUrl = process.env.PROVIDER_API_URL ;
+const providerApiKey = process.env.PROVIDER_API_KEY ;
 
 
 export async function POST(request) {
@@ -135,6 +137,9 @@ export async function POST(request) {
       status: 'pending',
     });
     await newOrder.save();
+
+console.log('Order created successfully:', newOrder);
+    updateOrderStatusFromApi(externalOrderId, newOrder._id)
 
     return NextResponse.json({
       message: 'Order created successfully.',

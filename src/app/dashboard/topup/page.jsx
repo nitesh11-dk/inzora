@@ -6,15 +6,14 @@ import axios from 'axios';
 import { getWalletFromToken } from "../actions";
 import { getProfileAction  } from "../profile/actions";
 import { FaWallet } from "react-icons/fa";
-
+import { useWallet } from "@/app/context/walletContext"; 
 const BASE_URL = '/api/razorpay'; 
 
 
 const TopUpWallet = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
-
+ const { wallet, setWallet } = useWallet(); // Use global wallet state
   const [loading, setLoading] = useState(false);
-  const [wallet, setWallet] = useState(null);
 
   const [user, setUser] = useState(null);
  let isLoggedIn = true;
@@ -25,14 +24,17 @@ const TopUpWallet = () => {
   }, []);
 
 
-  async function fetchWallet() {
+   // Fetch wallet from API and update context
+  const fetchWallet = async () => {
     try {
       const walletData = await getWalletFromToken();
-      setWallet(walletData);
+      setWallet(walletData); // update global wallet
     } catch (error) {
       console.log("Error fetching wallet:", error);
     }
-  }
+  };
+
+  
   useEffect(() => {
 
     if (isLoggedIn) {

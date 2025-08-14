@@ -1,6 +1,11 @@
 import axios from 'axios';
 import FormData from 'form-data';
 import Order from '@/lib/models/Order';
+
+const providerApiUrl = process.env.PROVIDER_API_URL ;
+const providerApiKey = process.env.PROVIDER_API_KEY ;
+
+
 export async function updateOrderStatusFromApi(actualOrderIdFromApi, createdOrderId) {
   try {
     const form = new FormData();

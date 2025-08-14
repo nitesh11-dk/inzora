@@ -15,6 +15,7 @@ export const WalletProvider = ({ children }) => {
     const fetchWallet = async () => {
       try {
         const walletData = await getWalletFromToken();
+        console.log("Fetched wallet data:", walletData);
         setWallet(walletData);
       } catch (err) {
         console.error("Error fetching wallet:", err);

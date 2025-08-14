@@ -22,7 +22,7 @@ export default async function DashboardLayout({ children }) {
 
   return (
     <WalletProvider initialWallet={wallet}> {/* pass initial server wallet */}
-        <Navbar isLoggedIn={!!user} >
+        <Navbar isLoggedIn={!!user} wallet={wallet} >
           <main className="w-full">{children}</main>
         </Navbar>
       

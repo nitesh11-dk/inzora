@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
  function DiscountForm() {
 
-  // const userId = "689c1502eba5f60ca5fef873" ;
+  const userId = "688a3f4578a20b675d158c85" ;
   const [serviceId, setServiceId] = useState("");
   const [discount, setDiscount] = useState("");
   const [message, setMessage] = useState(null);

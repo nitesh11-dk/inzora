@@ -40,7 +40,7 @@ const TopUpWallet = () => {
     if (isLoggedIn) {
       fetchWallet();
     }
-  }, [ isLoggedIn]);
+  }, [ isLoggedIn ,wallet]);
 
 
   const verifyPayment = async (paymentResponse) => {

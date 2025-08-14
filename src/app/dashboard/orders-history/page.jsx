@@ -67,7 +67,7 @@ const OrdersHistory = () => {
           <table className="w-full border border-gray-300">
             <thead>
               <tr className="bg-gray-100 text-gray-800">
-                <th className="px-4 py-2 border">Order ID (API)</th>
+                <th className="px-4 py-2 border">Order ID </th>
                 <th className="px-4 py-2 border">Price</th>
                 <th className="px-4 py-2 border">Quantity</th>
                 <th className="px-4 py-2 border">Start Count</th>

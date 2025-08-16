@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getProfileAction, editUserAction } from "./actions";
 import Link from "next/link";
-
+import LoadingState from "@/components/LodingState"; 
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -17,13 +17,12 @@ export default function ProfilePage() {
     alert("Updated!");
   }
 
-  async function handleDelete() {
-    if (!confirm("Are you sure?")) return;
-    await deleteUserAction(user._id);
-    alert("Deleted!");
-  }
-
-  if (!user)  return  <div className="flex w-full items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>;
+  // async function handleDelete() {
+  //   if (!confirm("Are you sure?")) return;
+  //   await deleteUserAction(user._id);
+  //   alert("Deleted!");
+  // }
+if (!user) return <LoadingState text="Loading profile..." />;  // ✅ spinner instead of plain text
 
   return (
     <div className="flex justify-center w-full items-center h-full bg-gray-50 px-4">

@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FaWhatsapp } from "react-icons/fa";
+import { ToastContainer } from 'react-toastify';
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -50,6 +51,7 @@ export default async function RootLayout({ children }) {
 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="h-screen">{children}</div>
+        <ToastContainer />
         <a
         href="https://wa.me/919403080787"
         target="_blank"

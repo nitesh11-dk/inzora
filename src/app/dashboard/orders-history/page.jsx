@@ -1,9 +1,10 @@
 "use client"
 import { useEffect, useState } from "react";
 import { FiRefreshCw } from "react-icons/fi";
-
+import LoadingState from "@/components/LodingState";
 const OrdersHistory = () => {
   const [orders, setOrders] = useState([]);
+const [refreshingOrderId, setRefreshingOrderId] = useState(null); 
 
   async function fetchAllOrders() {
     try {
@@ -29,34 +30,40 @@ const OrdersHistory = () => {
     fetchAllOrders();
   }, []);
 
+ 
   async function refreshOrderById(actualOrderIdFromApi, createdOrderId) {
     try {
+      setRefreshingOrderId(createdOrderId); // start animation
       const res = await fetch(`/api/orders/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actualOrderIdFromApi,
-          createdOrderId
-        })
+        body: JSON.stringify({ actualOrderIdFromApi, createdOrderId })
       });
 
       const data = await res.json();
-
       if (!res.ok) {
-        console.error('Failed to refresh order status:', data.error);
+        console.error("Failed to refresh order status:", data.error);
         return;
       }
 
-      console.log('Order refreshed successfully:', data);
+      console.log("Order refreshed successfully:", data);
       await fetchAllOrders();
     } catch (error) {
-      console.error('Error refreshing order:', error);
+      console.error("Error refreshing order:", error);
+    } finally {
+      setRefreshingOrderId(null); 
     }
   }
 
   const handleRefresh = async (actualOrderIdFromApi, createdOrderId) => {
     await refreshOrderById(actualOrderIdFromApi, createdOrderId);
   };
+
+
+   // ⏳ If data not loaded / empty
+    if (!orders || orders.length === 0) {
+      return <LoadingState text="Loading Orders ..." />;
+    }
 
   return (
     <div className="p-6 bg-gray-50 text-center w-full min-h-screen">
@@ -88,14 +95,19 @@ const OrdersHistory = () => {
                     <td className="px-4 py-2 border capitalize">{order.status}</td>
                     <td className="px-4 py-2 border">{order.remains || "-"}</td>
                     <td className="px-4 py-2 border">
-                      <button
-                        onClick={() => handleRefresh(order.actualOrderIdFromApi, order._id)}
-                        className={`text-indigo-600 hover:text-indigo-800 ${isCompleted ? "opacity-50 cursor-not-allowed" : ""}`}
-                        title={isCompleted ? "Completed" : "Refresh Order Status"}
-                        disabled={isCompleted}
-                      >
-                        <FiRefreshCw size={18} />
-                      </button>
+                       <button
+    onClick={() => handleRefresh(order.actualOrderIdFromApi, order._id)}
+    className={`text-indigo-600 hover:text-indigo-800 ${
+      isCompleted ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+    title={isCompleted ? "Completed" : "Refresh Order Status"}
+    disabled={isCompleted}
+  >
+    <FiRefreshCw
+      size={18}
+      className={refreshingOrderId === order._id ? "animate-spin" : ""}
+    />
+  </button>
                     </td>
                   </tr>
                 );
@@ -136,14 +148,18 @@ const OrdersHistory = () => {
                   <span className="font-semibold">Remains:</span> {order.remains || "-"}
                 </p>
                 <button
-                  onClick={() => handleRefresh(order.actualOrderIdFromApi, order._id)}
-                  className={`flex items-center text-indigo-600 hover:text-indigo-800 ${isCompleted ? "opacity-50 cursor-not-allowed" : ""}`}
-                  title={isCompleted ? "Completed" : "Refresh Order Status"}
-                  disabled={isCompleted}
-                >
-                  <FiRefreshCw size={18} className="mr-1" />
-                  <span>Refresh</span>
-                </button>
+    onClick={() => handleRefresh(order.actualOrderIdFromApi, order._id)}
+    className={`text-indigo-600 hover:text-indigo-800 ${
+      isCompleted ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+    title={isCompleted ? "Completed" : "Refresh Order Status"}
+    disabled={isCompleted}
+  >
+    <FiRefreshCw
+      size={18}
+      className={refreshingOrderId === order._id ? "animate-spin" : ""}
+    />
+  </button>
               </div>
             );
           })

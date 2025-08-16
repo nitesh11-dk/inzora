@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import UserForm from "@/components/UserForm";
 import { getProfileAction, editUserAction } from "../actions";
-
+import { toast } from "react-toastify";
+import LoadingState from "@/components/LodingState"; 
 const EditUser = () => {
-  const router = useRouter();  // initialize router
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,13 +20,14 @@ const EditUser = () => {
       })
       .catch((err) => {
         console.error(err);
-        setError("Failed to load user profile");
+        setError("⚠️ Failed to load user profile");
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <p>Loading profile...</p>;
-  if (error) return <p>{error}</p>;
+ if (loading) return <LoadingState text="Loading profile..." />;  
+ if (error) return <p>{error}</p>;
+
 
   const initialData = {
     name: user.name || "",
@@ -36,15 +38,18 @@ const EditUser = () => {
   const handleEdit = async (formData) => {
     try {
       const res = await editUserAction(formData);
+
       if (res.success) {
-        router.push("/dashboard/profile");  // Navigate on success
+        toast.success("✅ Profile updated successfully!", { autoClose: 2000 });
+        router.push("/dashboard/profile"); // Navigate on success
       } else {
-        alert("Failed to update profile");
+        toast.error(res.message || "❌ Failed to update profile");
       }
+
       return res;
     } catch (err) {
       console.error(err);
-      alert("Failed to update profile");
+      toast.error("🚨 Something went wrong while updating profile");
       return { success: false };
     }
   };

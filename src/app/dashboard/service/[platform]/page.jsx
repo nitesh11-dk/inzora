@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { FiArrowLeft } from "react-icons/fi";
 import { getDiscountedServicesByPlatform } from "../../actions"; // your createOrder action
-
+import { toast } from "react-toastify";
+import LoadingState from "@/components/LodingState"; 
 
 const fetchServicesByPlatform = async (platform) => {
   const res = await getDiscountedServicesByPlatform(platform);
@@ -86,53 +87,61 @@ const PlatformServicePage = () => {
     ? "profile"
     : "";
 
-    
-    const onSubmit = async (data) => {
-      const orderData = {
-        platform,
-        category: selectedCategory,
-        service: selectedService.service,
-        quantity: data.quantity,
-        price: calculatedPrice,
-        link: data.link,
-      };
-      try {
-        const res = await fetch('/api/orders/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // If your API requires authentication, add Authorization header here,
-            // e.g., 'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(orderData),
-        });
-    
-        const result = await res.json();
-    
-        if (res.ok && result.validated) {
-          reset();
-          setSelectedCategory("");
-          setSelectedService(null);
-          setCalculatedPrice(0);
-          alert("Order placed successfully!");
-        } else {
-          // If server responded with an error
-          alert("Order failed: " + (result.error || 'Unknown error'));
-        }
-      } catch (err) {
-        alert("Order failed: " + err.message);
-      }
-    };
-    
+  
+const onSubmit = async (data) => {
+  const orderData = {
+    platform,
+    category: selectedCategory,
+    service: selectedService.service,
+    quantity: data.quantity,
+    price: calculatedPrice,
+    link: data.link,
+  };
 
-  if (loading) {
-    return  <div className="flex items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>;
+  try {
+    const res = await fetch("/api/orders/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Add Authorization header if needed
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    const result = await res.json();
+
+    if (res.ok && result.validated) {
+      reset();
+      setSelectedCategory("");
+      setSelectedService(null);
+      setCalculatedPrice(0);
+
+      toast.success("🎉 Order placed successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    } else {
+      toast.error(`❌ Order failed: ${result.error || "Unknown error"}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  } catch (err) {
+    console.error("Order error:", err);
+    toast.error(`🚨 Order failed: ${err.message}`, {
+      position: "top-right",
+      autoClose: 3000,
+    });
   }
+};
+
+    
+if (loading) return <LoadingState text="Loading Services..." />; // ✅ spinner here
 
   if (error) {
     return <p className="text-center py-10 text-red-500">{error}</p>;
   }
-
+  
   if (!platformServices) {
     
     return   <div className="flex items-center justify-center w-full"> <p className="text-center py-10">No services found for this platform.</p> </div>;

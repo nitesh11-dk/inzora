@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { loginUser } from "./actions"; // server action
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,15 +15,22 @@ export default function LoginPage() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
+    try {
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
 
-    const res = await loginUser(formData);
-    if (res.success) {
-      router.push("/dashboard"); // navigate to dashboard
-    } else {
-      alert(res.message);
+      const res = await loginUser(formData);
+
+      if (res.success) {
+        toast.success("✅ Logged in successfully!", { autoClose: 2000 });
+        router.push("/dashboard");
+      } else {
+        toast.error(res.message || "❌ Login failed, please try again");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("🚨 Something went wrong. Please try again.");
     }
   };
 
@@ -42,7 +50,9 @@ export default function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
               placeholder="Enter your email"
             />
-            {errors.email && <p className="text-red-500 text-xs">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
@@ -56,7 +66,9 @@ export default function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
               placeholder="Enter your password"
             />
-            {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-xs">{errors.password.message}</p>
+            )}
           </div>
 
           <button

@@ -1,8 +1,12 @@
 "use client";
 
+"use client";
+
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";  // Next.js router
-import { getAllServices } from "../actions";   // your server action file
+import { useRouter } from "next/navigation";  
+import { getAllServices } from "../actions";   
+import LoadingState from "@/components/LodingState"; 
+ // 👈 reusable loader
 
 const Services = () => {
   const router = useRouter();
@@ -14,7 +18,7 @@ const Services = () => {
     async function fetchAllServices() {
       try {
         setLoading(true);
-        const data = await getAllServices(); // call your server action here
+        const data = await getAllServices(); // server action
         setServices(data.data);
       } catch (err) {
         setError(err.message || "Failed to load services");
@@ -30,14 +34,13 @@ const Services = () => {
     router.push(`/dashboard/service/${encodeURIComponent(platformName.toLowerCase())}`);
   };
 
-  if (loading) {
-   return  <div className="flex items-center justify-center w-full"> <p className="text-center  text-3xl">Loading Services</p> </div>
-  }
+  if (loading) return <LoadingState text="Loading Services..." />; 
 
   if (error) {
     return <p className="text-center py-10 text-red-500">{error}</p>;
   }
 
+  
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Professional Header */}

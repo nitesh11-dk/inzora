@@ -32,6 +32,23 @@ export async function getWalletFromToken() {
 }
 
 
+// Helper: recursively convert Mongoose ObjectIds (and nested docs) into plain JSON
+function cleanDoc(doc) {
+  if (Array.isArray(doc)) {
+    return doc.map(cleanDoc);
+  } else if (doc && typeof doc === "object") {
+    const newObj = {};
+    for (const [key, value] of Object.entries(doc)) {
+      if (key === "_id" || key.endsWith("Id")) {
+        newObj[key] = value?.toString();
+      } else {
+        newObj[key] = cleanDoc(value);
+      }
+    }
+    return newObj;
+  }
+  return doc;
+}
 
 
 export async function getDiscountedServicesByPlatform(platform) {
@@ -40,7 +57,8 @@ export async function getDiscountedServicesByPlatform(platform) {
   if (!currUser || !currUser.id) {
     throw new Error("Unauthorized: Invalid token");
   }
-  let userId = currUser.id; 
+
+  const userId = currUser.id;
   if (!platform) throw new Error("Platform name is required.");
   if (!userId) throw new Error("User ID is required.");
 
@@ -51,34 +69,34 @@ export async function getDiscountedServicesByPlatform(platform) {
   if (!user) throw new Error("User not found.");
 
   // Fetch platform services
-  const platformDoc = await PlatformService.findOne({ name: platform.toLowerCase() }).lean();
+  const platformDoc = await PlatformService.findOne({
+    name: platform.toLowerCase(),
+  }).lean();
   if (!platformDoc) throw new Error("Platform services not found.");
 
   const categories = {};
 
   for (const [categoryName, services] of Object.entries(platformDoc.categories)) {
-    categories[categoryName] = services.map(service => {
-      // Find discount for this service
-      const discountObj = user.discount.find(d =>
-        d.serviceId.toString() === service.service.toString()
+    categories[categoryName] = services.map((service) => {
+      const discountObj = user.discount.find(
+        (d) => d.serviceId.toString() === service.service.toString()
       );
 
       const discountApplied = discountObj ? discountObj.discount : null;
 
       return {
-        ...service,
-        discountApplied,   // discount percentage or null
-        // rate remains original, no changes here
+        ...cleanDoc(service), // ✅ ensures service._id and service.service are strings
+        discountApplied,
       };
     });
   }
 
-  return {
+  // ✅ clean entire doc before returning
+  return cleanDoc({
     ...platformDoc,
     categories,
-  };
+  });
 }
-
 
 export const getAllServices = async () => {
   try {

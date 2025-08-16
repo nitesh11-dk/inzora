@@ -1,5 +1,5 @@
 import { getUserTopUpOrders } from "./actions";
-
+import LoadingState from "@/components/LodingState";
 const TopUPHistory = async () => {
   // Server-side fetch
   let orders = [];
@@ -9,6 +9,11 @@ const TopUPHistory = async () => {
     orders = response.orders;
   } catch (error) {
     console.error("Failed to load top-up history:", error);
+  }
+
+   // ⏳ If data not loaded / empty
+  if (!orders || orders.length === 0) {
+    return <LoadingState text="Loading Topup's..." />;
   }
 
   return (

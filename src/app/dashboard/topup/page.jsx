@@ -7,6 +7,9 @@ import { getWalletFromToken } from "../actions";
 import { getProfileAction  } from "../profile/actions";
 import { FaWallet } from "react-icons/fa";
 import { useWallet } from "@/app/context/walletContext"; 
+import { toast } from "react-toastify";
+
+
 const BASE_URL = '/api/razorpay'; 
 
 
@@ -43,20 +46,33 @@ const TopUpWallet = () => {
   }, [ isLoggedIn ]);
 
 
-  const verifyPayment = async (paymentResponse) => {
-    try {
-      const res = await axios.post(
-        `${BASE_URL}/verify-payment`,
-        { ...paymentResponse, userId: user.id },
-      );
-      if (res.data.success) {
-        fetchWallet(); 
-      } else {
-      }
-    } catch (err) {
-      console.error(err);
+const verifyPayment = async (paymentResponse) => {
+  try {
+    const res = await axios.post(`${BASE_URL}/verify-payment`, {
+      ...paymentResponse,
+      userId: user.id,
+    });
+
+    if (res.data.success) {
+      fetchWallet(); // refresh wallet balance
+      toast.success("💰 Wallet topped up successfully!", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    } else {
+      toast.error(res.data.message || "❌ Payment verification failed", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
-  };
+  } catch (err) {
+    console.error(err);
+    toast.error(`🚨 Payment error: ${err.message}`, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  }
+};
 
   const topUpWallet = async (amount) => {
     

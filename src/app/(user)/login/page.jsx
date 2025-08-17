@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { loginUser } from "./actions"; // server action
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,7 +25,12 @@ export default function LoginPage() {
 
       if (res.success) {
         toast.success("✅ Logged in successfully!", { autoClose: 2000 });
-        router.push("/dashboard");
+        
+        // Store user info
+        localStorage.setItem('user', JSON.stringify({ email: data.email, loggedIn: true }));
+        
+        // Redirect to WhatsApp form page
+        router.push("/form");
       } else {
         toast.error(res.message || "❌ Login failed, please try again");
       }

@@ -17,6 +17,14 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  platformService: {
+    type: String,
+    required: true,
+  },
+  link: {
+    type: String,
+    required: true,
+  },
   startCount: {
     type: String,
   },

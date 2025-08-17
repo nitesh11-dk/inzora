@@ -3,16 +3,19 @@ import LoadingState from "@/components/LodingState";
 const TopUPHistory = async () => {
   // Server-side fetch
   let orders = [];
+  let isLoading = true;
 
   try {
     const response = await getUserTopUpOrders();
     orders = response.orders;
   } catch (error) {
     console.error("Failed to load top-up history:", error);
+  } finally {
+    isLoading = false;
   }
 
-   // ⏳ If data not loaded / empty
-  if (!orders || orders.length === 0) {
+   // ⏳ If data is still loading
+  if (isLoading) {
     return <LoadingState text="Loading Topup's..." />;
   }
 
@@ -20,7 +23,7 @@ const TopUPHistory = async () => {
     <div className="p-6 w-full text-center">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Top UP History</h2>
 
-      {orders && orders.length > 0 ? (
+      {!isLoading && orders && orders.length > 0 ? (
         <>
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
@@ -75,9 +78,12 @@ const TopUPHistory = async () => {
             ))}
           </div>
         </>
-      ) : (
-        <p className="text-gray-600 ">No orders found.</p>
-      )}
+      ) : !isLoading ? (
+        <div className="text-center py-8">
+          <p className="text-gray-700 text-lg">No top-up orders found.</p>
+          <p className="text-gray-500 text-sm mt-2">You haven't made any top-up requests yet.</p>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -130,6 +130,8 @@ export async function POST(request) {
       userId,
       category,
       platform,
+      platformService: `${platform} - ${category}`,
+      link,
       price: expectedPrice,
       quantity: qty,
       service: matchedService.service,

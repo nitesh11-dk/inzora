@@ -16,7 +16,7 @@ export async function GET() {
     const userId = currUser.id;
 
     const orders = await Order.find({ userId })
-      .select('_id price quantity startCount status remains actualOrderIdFromApi')
+      .select('_id price quantity startCount status remains actualOrderIdFromApi link platformService')
       .sort({ createdAt: -1 })
       .lean();
 

@@ -17,9 +17,9 @@ const WhatsAppFormPage = () => {
     try {
       // Here you can add API call to save the phone number
       // For now, we'll just redirect to WhatsApp
-      const whatsappUrl = `https://wa.me/919403080787?text=Hi! I want to join the WhatsApp channel for updates. My number: ${phoneNumber}`;
-      window.open(whatsappUrl, '_blank');
-      
+    const whatsappUrl = "https://whatsapp.com/channel/0029VbBW4eiLo4hlVC8BT932";
+window.open(whatsappUrl, "_blank");
+
       // Redirect to dashboard after successful submission
       setTimeout(() => {
         router.push('/dashboard');

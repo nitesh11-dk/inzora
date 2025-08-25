@@ -4,28 +4,22 @@ import { useRouter } from 'next/navigation';
 import { FaWhatsapp, FaTimes } from 'react-icons/fa';
 
 const WhatsAppFormPage = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!phoneNumber.trim()) return;
-
     setIsSubmitting(true);
-    
-    try {
-      // Here you can add API call to save the phone number
-      // For now, we'll just redirect to WhatsApp
-    const whatsappUrl = "https://whatsapp.com/channel/0029VbBW4eiLo4hlVC8BT932";
-window.open(whatsappUrl, "_blank");
 
-      // Redirect to dashboard after successful submission
+    try {
+      const whatsappUrl = "https://whatsapp.com/channel/0029VbBW4eiLo4hlVC8BT932";
+      window.open(whatsappUrl, "_blank");
+
       setTimeout(() => {
         router.push('/dashboard');
       }, 1000);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Error joining channel:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -59,44 +53,24 @@ window.open(whatsappUrl, "_blank");
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              WhatsApp Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter your WhatsApp number"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-              required
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              We'll send you updates and exclusive offers
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting || !phoneNumber.trim()}
-            className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Joining...
-              </>
-            ) : (
-              <>
-                <FaWhatsapp />
-                Join WhatsApp Channel
-              </>
-            )}
-          </button>
-        </form>
+        {/* Join Button Only */}
+        <button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Joining...
+            </>
+          ) : (
+            <>
+              <FaWhatsapp />
+              Join WhatsApp Channel
+            </>
+          )}
+        </button>
 
         {/* Benefits */}
         <div className="mt-6 pt-6 border-t border-gray-200">

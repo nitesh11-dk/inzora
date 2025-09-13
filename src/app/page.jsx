@@ -117,6 +117,7 @@ const LandingPage = () => {
         </div>
       </section>
 
+  
       {/* Trusted by Section */}
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -239,14 +240,18 @@ const LandingPage = () => {
               <p className="text-gray-600">Success Rate</p>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-600 mb-2">12/7</div>
+              <div className="text-3xl font-bold text-orange-600 mb-2">
+                12/7
+              </div>
               <p className="text-gray-600">Support</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* The rest of your Contact & Footer sections would be kept exactly the same */}
+      
+
+      {/* Footer + Contact (continue here if needed) */}
     </div>
   );
 };

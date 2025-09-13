@@ -51,7 +51,16 @@ export default async function RootLayout({ children }) {
       <head>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+        />
+
+        {/* ✅ Add Google AdSense meta tag */}
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-7981557748614052"
+        />
       </head>
 
       <body
@@ -60,10 +69,10 @@ export default async function RootLayout({ children }) {
         <div className="h-screen">{children}</div>
         <ToastContainer />
 
-        {/* ✅ Razorpay */}
+        {/* Razorpay */}
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
-        {/* ✅ Google AdSense */}
+        {/* Google AdSense */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7981557748614052"
